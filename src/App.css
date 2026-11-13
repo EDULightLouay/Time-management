@@ -46,7 +46,12 @@ img { max-width: 100%; display: block; }
   margin-inline: auto;
   padding: max(24px, env(safe-area-inset-top)) 0 max(88px, env(safe-area-inset-bottom));
   display: grid; gap: clamp(48px, 9vw, 110px);
+  grid-template-columns: minmax(0, 1fr);
 }
+/* منع أي عنصر داخلي من توسيع العمود خارج الشاشة (سبب الإزاحة على اليسار في الجوال) */
+.page > *, .hero > *, .groups > *, .pay > *, .pay-info > *, .pay-form > *, .form > * { min-width: 0; }
+.hero, .groups, .pay, .pay-info, .pay-form, .form, .checks, .about, .footer { grid-template-columns: minmax(0, 1fr); }
+.copybox, .phone-wrap, .form .field, .form label, .done, .hero-actions, .hero-copy { grid-template-columns: minmax(0, 1fr); min-width: 0; max-width: 100%; }
 
 /* الزجاج */
 .glass {
@@ -486,4 +491,3 @@ h1, h2, h3, .h2, .h3, .group-title, .price-num { font-family: var(--display); fo
 .phone-menu .cn { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .phone-menu .ck { flex: none; color: rgba(241, 241, 241, 0.6); font-size: 0.85rem; }
 .phone-menu .none { padding: 14px; text-align: center; color: rgba(241, 241, 241, 0.55); font-size: 0.9rem; }
-.flag-empty { flex: none; display: inline-block; width: 26px; height: 17px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); }
