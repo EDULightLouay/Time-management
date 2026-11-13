@@ -7,6 +7,8 @@ import r1 from "./assets/reviews/r1.jpg";
 import r2 from "./assets/reviews/r2.jpg";
 import r3 from "./assets/reviews/r3.jpg";
 import r4 from "./assets/reviews/r4.jpg";
+import PhoneField from "./PhoneField.jsx";
+import { DEFAULT_COUNTRY, checkPhone } from "./phone.js";
 
 // الصق هنا رابط Web App الناتج عن Google Apps Script (انظر README.txt)
 const YT_LINK = "https://youtube.com/@edu_light?si=3mWQACSP5dUV3vKV";
@@ -75,44 +77,11 @@ const ERROR_MESSAGES = {
   server: "وصل الطلب لكن الخادم لم يردّ بشكل صحيح. أعد نشر Apps Script ثم حاول مرة أخرى.",
 };
 
-const PAY_CODE = "bdfef7b2cfc74571ccea5322d02b40e7";
-
-// خانة الكود: النقر عليها ينسخ الكود إلى الحافظة
-function CopyCode({ value }) {
-  const [copied, setCopied] = useState(false);
-  const timer = useRef(null);
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(value);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = value;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); } catch { /* تجاهل */ }
-      document.body.removeChild(ta);
-    }
-    setCopied(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button type="button" className={`copy-code${copied ? " copied" : ""}`} onClick={copy} aria-label="نسخ الكود">
-      <bdi className="copy-code-val" dir="ltr">{value}</bdi>
-      <span className="copy-code-act" aria-live="polite">{copied ? "تم النسخ ✓" : "انقر للنسخ"}</span>
-    </button>
-  );
-}
-
 function ReceiptForm({ onDone }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [iso, setIso] = useState(DEFAULT_COUNTRY);
+  const check = checkPhone(iso, phone);
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
   const [errorMsg, setErrorMsg] = useState("");
@@ -120,7 +89,7 @@ function ReceiptForm({ onDone }) {
 
   async function submit(e) {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !check.ok) return;
     setStatus("sending");
     try {
       const data = await shrink(file);
@@ -129,7 +98,7 @@ function ReceiptForm({ onDone }) {
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           name,
-          phone,
+          phone: check.full,
           fileName: `${name || "receipt"}-${Date.now()}.jpg`,
           mimeType: "image/jpeg",
           data,
@@ -170,17 +139,10 @@ function ReceiptForm({ onDone }) {
         الاسم
         <input required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
       </label>
-      <label>
-        رقم الهاتف
-        <input
-          required
-          inputMode="tel"
-          dir="ltr"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          autoComplete="tel"
-        />
-      </label>
+      <div className="field">
+        <span id="phone-label">رقم الهاتف</span>
+        <PhoneField iso={iso} onIso={setIso} value={phone} onValue={setPhone} labelId="phone-label" />
+      </div>
       <button type="button" className="pick" onClick={() => input.current.click()}>
         {file ? `تم اختيار: ${file.name}` : "اختر صورة الوصل"}
       </button>
@@ -191,7 +153,7 @@ function ReceiptForm({ onDone }) {
         hidden
         onChange={(e) => setFile(e.target.files[0] || null)}
       />
-      <button className="btn" disabled={!file || status === "sending"}>
+      <button className="btn" disabled={!file || !check.ok || status === "sending"}>
         {status === "sending" ? "جارٍ الإرسال…" : "أرسل الوصل"}
       </button>
       <p className="note">{CONTACT_NOTE}</p>
@@ -201,6 +163,50 @@ function ReceiptForm({ onDone }) {
         </p>
       )}
     </form>
+  );
+}
+
+const PAY_CODE = "bdfef7b2cfc74571ccea5322d02b40e7";
+
+// خانة نسخ الكود: نقرة واحدة تنسخ الكود كاملاً
+function CopyCode({ code }) {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef(null);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      // احتياط للمتصفحات القديمة أو الاتصال غير الآمن
+      const t = document.createElement("textarea");
+      t.value = code;
+      t.setAttribute("readonly", "");
+      t.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+      document.body.appendChild(t);
+      t.select();
+      try { document.execCommand("copy"); } catch { /* تجاهل */ }
+      document.body.removeChild(t);
+    }
+    setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 2200);
+  }
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  return (
+    <div className="copybox">
+      <span className="copybox-label">أو انسخ الكود</span>
+      <button type="button" className={`copycode${copied ? " ok" : ""}`} onClick={copy} aria-label={`نسخ الكود ${code}`}>
+        <code className="copycode-text" dir="ltr">{code}</code>
+        <span className="copycode-act" aria-hidden="true">
+          <svg className="ic-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5" /><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15" /></svg>
+          <svg className="ic-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <span className="copycode-word">{copied ? "تم النسخ" : "انقر للنسخ"}</span>
+        </span>
+      </button>
+      <span className="sr-only" role="status" aria-live="polite">{copied ? "تم نسخ الكود" : ""}</span>
+    </div>
   );
 }
 
@@ -430,8 +436,8 @@ export default function App() {
               </ol>
               <div className="qr">
                 <img src={qrImg} alt="كود الدفع عبر شام كاش" loading="lazy" />
-                <CopyCode value={PAY_CODE} />
               </div>
+              <CopyCode code={PAY_CODE} />
             </div>
             <div className="pay-form">
               <ReceiptForm onDone={() => setSent(true)} />
