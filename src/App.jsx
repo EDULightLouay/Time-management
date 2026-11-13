@@ -169,6 +169,50 @@ function ReceiptForm({ onDone }) {
   );
 }
 
+const PAY_CODE = "bdfef7b2cfc74571ccea5322d02b40e7";
+
+// خانة نسخ الكود: نقرة واحدة تنسخ الكود كاملاً
+function CopyCode({ code }) {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef(null);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      // احتياط للمتصفحات القديمة أو الاتصال غير الآمن
+      const t = document.createElement("textarea");
+      t.value = code;
+      t.setAttribute("readonly", "");
+      t.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+      document.body.appendChild(t);
+      t.select();
+      try { document.execCommand("copy"); } catch { /* تجاهل */ }
+      document.body.removeChild(t);
+    }
+    setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 2200);
+  }
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  return (
+    <div className="copybox">
+      <span className="copybox-label">أو انسخ الكود يدوياً</span>
+      <button type="button" className={`copycode${copied ? " ok" : ""}`} onClick={copy} aria-label={`نسخ الكود ${code}`}>
+        <code className="copycode-text" dir="ltr">{code}</code>
+        <span className="copycode-act" aria-hidden="true">
+          <svg className="ic-copy" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5" /><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15" /></svg>
+          <svg className="ic-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <span className="copycode-word">{copied ? "تم النسخ" : "انقر للنسخ"}</span>
+        </span>
+      </button>
+      <span className="sr-only" role="status" aria-live="polite">{copied ? "تم نسخ الكود" : ""}</span>
+    </div>
+  );
+}
+
 // توهّج يتبع المؤشر داخل البطاقة الزجاجية
 function spot(e) {
   const r = e.currentTarget.getBoundingClientRect();
@@ -396,6 +440,7 @@ export default function App() {
               <div className="qr">
                 <img src={qrImg} alt="كود الدفع عبر شام كاش" loading="lazy" />
               </div>
+              <CopyCode code={PAY_CODE} />
             </div>
             <div className="pay-form">
               <ReceiptForm onDone={() => setSent(true)} />
