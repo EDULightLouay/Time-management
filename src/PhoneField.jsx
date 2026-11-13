@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COUNTRIES, flagOf, cleanDigits, checkPhone, hintFor } from "./phone.js";
 
+// علم الدولة، ومربع فارغ بنفس الحجم إذا لم يوجد ملف العلم
+function Flag({ iso }) {
+  const src = flagOf(iso);
+  return src ? <img src={src} alt="" width="26" height="17" loading="lazy" /> : <span className="flag-empty" aria-hidden="true" />;
+}
+
 // حقل رقم هاتف: قائمة دول منسدلة بالأعلام ورمز الدولة + تحقق حسب الدولة
 export default function PhoneField({ iso, onIso, value, onValue, labelId }) {
   const [open, setOpen] = useState(false);
@@ -39,7 +45,7 @@ export default function PhoneField({ iso, onIso, value, onValue, labelId }) {
           onClick={() => setOpen((o) => !o)}
           onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
         >
-          <img src={flagOf(country.iso)} alt="" width="26" height="17" />
+          <Flag iso={country.iso} />
           <bdi dir="ltr">+{country.code}</bdi>
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" className={open ? "up" : ""}><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
@@ -66,7 +72,7 @@ export default function PhoneField({ iso, onIso, value, onValue, labelId }) {
             {list.map((c) => (
               <li key={c.iso} role="option" aria-selected={c.iso === iso}>
                 <button type="button" className={c.iso === iso ? "on" : ""} onClick={() => pick(c)}>
-                  <img src={flagOf(c.iso)} alt="" width="26" height="17" loading="lazy" />
+                  <Flag iso={c.iso} />
                   <span className="cn">{c.name}</span>
                   <bdi dir="ltr" className="ck">+{c.code}</bdi>
                 </button>
