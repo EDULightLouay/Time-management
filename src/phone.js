@@ -2,7 +2,9 @@ import { getCountries, getCountryCallingCode, parsePhoneNumberFromString } from 
 
 // أعلام الدول (علم سوريا الجديد: أخضر/أبيض/أسود بثلاث نجوم حمراء). تُحمَّل كملفات منفصلة.
 const flagFiles = import.meta.glob("./assets/flags/*.svg", { eager: true, query: "?url", import: "default" });
-export const flagOf = (iso) => flagFiles[`./assets/flags/${iso}.svg`];
+// علم سوريا الجديد مضمّن داخل الكود نفسه، فيظهر دائماً حتى لو لم تُرفع ملفات الأعلام
+const SYRIA_FLAG = "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 900 600%22%3E%3Cpath d=%22M0 0h900v600H0z%22 fill=%22%230f0f0f%22/%3E%3Cpath d=%22M0 0h900v400H0z%22 fill=%22%23fff%22/%3E%3Cpath d=%22M0 0h900v200H0z%22 fill=%22%23047a3f%22/%3E%3Cpath d=%22m176.26 375 48.738-150 48.738 150-127.6-92.705h157.72M626.256 375l48.738-150 48.738 150-127.6-92.705h157.72M401.252 375l48.738-150 48.738 150-127.6-92.705h157.72%22 fill=%22%23ce1126%22/%3E%3C/svg%3E";
+export const flagOf = (iso) => (iso === "SY" ? SYRIA_FLAG : flagFiles[`./assets/flags/${iso}.svg`]);
 
 export const DEFAULT_COUNTRY = "SY";
 
@@ -10,7 +12,6 @@ const names = new Intl.DisplayNames(["ar"], { type: "region" });
 
 // قائمة الدول: سوريا أولاً ثم البقية أبجدياً بالعربية
 export const COUNTRIES = getCountries()
-  .filter((iso) => flagOf(iso))
   .map((iso) => ({ iso, name: names.of(iso) || iso, code: getCountryCallingCode(iso) }))
   .sort((a, b) =>
     a.iso === DEFAULT_COUNTRY ? -1 : b.iso === DEFAULT_COUNTRY ? 1 : a.name.localeCompare(b.name, "ar")
