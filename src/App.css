@@ -413,3 +413,58 @@ h1, h2, h3, .h2, .h3, .group-title, .price-num { font-family: var(--display); fo
   box-shadow: 0 10px 30px rgba(255, 210, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 .wa-help.gold:hover { background: linear-gradient(135deg, #fff0a0, #ffd94a 45%, #d9a512); border-color: var(--yellow); }
+
+/* ===== خانة نسخ الكود: ذهبية فاخرة ===== */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.copybox { width: min(100%, 360px); margin-top: 18px; display: grid; gap: 10px; }
+.copybox-label { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; font-weight: 600; color: rgba(241, 241, 241, 0.65); }
+.copybox-label::before, .copybox-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 210, 0, 0.45)); }
+.copybox-label::after { transform: scaleX(-1); }
+
+.copycode {
+  position: relative; isolation: isolate; overflow: hidden; width: 100%;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 7px 7px 7px 16px; border-radius: 999px; cursor: pointer; font: inherit; color: var(--white);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)) padding-box,
+    linear-gradient(135deg, #fff0a0, var(--yellow) 40%, var(--gold) 75%, rgba(255, 210, 0, 0.3)) border-box;
+  border: 1.5px solid transparent;
+  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 210, 0, 0.1);
+  transition: transform 0.35s var(--ease), box-shadow 0.4s var(--ease);
+}
+/* لمعة تعبر الخانة عند التمرير */
+.copycode::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; transform: translateX(-120%);
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 224, 102, 0.22) 50%, transparent 70%);
+  transition: transform 0.9s var(--ease);
+}
+.copycode:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 18px 48px rgba(0, 0, 0, 0.55), 0 0 56px rgba(255, 210, 0, 0.22); }
+.copycode:hover::before { transform: translateX(120%); }
+.copycode:active { transform: scale(0.985); }
+.copycode:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
+
+.copycode-text {
+  flex: 1 1 auto; min-width: 0; text-align: left; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: clamp(0.72rem, 3.1vw, 0.86rem); font-weight: 700; letter-spacing: 0.04em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; -webkit-user-select: all;
+  color: #ffe58a; text-shadow: 0 0 22px rgba(255, 210, 0, 0.35);
+}
+.copycode-act {
+  flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+  font-weight: 800; font-size: 0.9rem; line-height: 1.4; color: var(--black);
+  background: linear-gradient(135deg, #ffe566, var(--yellow) 50%, var(--gold));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 20px rgba(255, 210, 0, 0.3);
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+.copycode .ic-check { display: none; }
+.copycode.ok .ic-copy { display: none; }
+.copycode.ok .ic-check { display: block; }
+.copycode.ok { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 210, 0, 0.35); }
+.copycode.ok .copycode-act { background: linear-gradient(135deg, #fff6c2, #ffe566 55%, var(--yellow)); }
+@media (prefers-reduced-motion: no-preference) {
+  .copycode.ok .ic-check path { stroke-dasharray: 26; stroke-dashoffset: 26; animation: tick 0.45s var(--ease) forwards; }
+  @keyframes tick { to { stroke-dashoffset: 0; } }
+}
+@media (prefers-reduced-motion: reduce) { .copycode::before { display: none; } }
+@media (prefers-reduced-transparency: reduce) { .copycode { -webkit-backdrop-filter: none; backdrop-filter: none; } }
