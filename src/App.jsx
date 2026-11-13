@@ -199,12 +199,12 @@ function CopyCode({ code }) {
 
   return (
     <div className="copybox">
-      <span className="copybox-label">أو انسخ الكود يدوياً</span>
+      <span className="copybox-label">أو انسخ الكود</span>
       <button type="button" className={`copycode${copied ? " ok" : ""}`} onClick={copy} aria-label={`نسخ الكود ${code}`}>
         <code className="copycode-text" dir="ltr">{code}</code>
         <span className="copycode-act" aria-hidden="true">
-          <svg className="ic-copy" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5" /><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15" /></svg>
-          <svg className="ic-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          <svg className="ic-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5" /><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15" /></svg>
+          <svg className="ic-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
           <span className="copycode-word">{copied ? "تم النسخ" : "انقر للنسخ"}</span>
         </span>
       </button>
